@@ -1,31 +1,37 @@
 let rowsPerPage = 10;
 let currentPage = 1;
-let processedDatabase;
-let territoryDetails;
+let processedDatabase = null;
+let territoryDetails= null;
+let callAnalysis= null;
+let territorialCallAnalysis= null
 const userDropdown = document.getElementById("user");
+const ctx = document.getElementById('myChart').getContext('2d');
 
 const populateUserDropdown = (users) => {
-    const fragment = document.createDocumentFragment(); 
-    users.forEach(user => {
-        const option = document.createElement("option");
-        option.value = user.territory;
-        option.textContent = user.userName;
-        fragment.appendChild(option);
-    });
+  const fragment = document.createDocumentFragment(); 
+  users.forEach(user => {
+      const option = document.createElement("option");
+      option.value = user.territory;
+      option.textContent = user.userName;
+      fragment.appendChild(option);
+  });
 
-    userDropdown.appendChild(fragment);
+  userDropdown.appendChild(fragment);
 };
 // load processed data from db.js  
 loadData().then((data) => {
-    if (data) {
-        const { users, accounts, calls, emails } = data;
-        console.log("All data loaded successfully:", data);
-        processedDatabase = createIndexes(accounts, calls, emails);
-        console.log({processedDatabase})
-      
-        populateUserDropdown(users);
-    }
+  if (data) {
+      const { users, accounts, calls, emails } = data;
+      console.log("All data loaded successfully:", data);
+      processedDatabase = createIndexes(accounts, calls, emails);
+      console.log({processedDatabase})
+    
+      populateUserDropdown(users);
+  }
 });
+
+
+
 
 const formatDate = (date) => {
     const d = new Date(date);
@@ -35,40 +41,22 @@ const formatDate = (date) => {
     
     return `${day}/${month}/${year}`;
 };
-function getAccountDataByUser(territory, processedDatabase) {
-    const { accountIndexByTerritory, callIndexByAccount, emailIndexByAccount } = processedDatabase;
-    const result = [];
 
+function getAccountDataByUser(territory, processedDatabase) {
+    const { accountIndexByTerritory, proccessedCallData, callIndexedSummary, emailIndexedSummury } = processedDatabase;
     // Get accounts for the specified territory
     const accounts = accountIndexByTerritory[territory] || [];
-
+  
     for (const account of accounts) {
-        // if (account.userId !== parseInt(userId)) continue;
-
-        const calls = callIndexByAccount[account.id] || [];
-        const emails = emailIndexByAccount[account.id] || [];
-
-        let totalCalls = calls.length;
-        let totalEmails = emails.length;
-
-        let latestPhoneDate = totalCalls
-            ? calls.reduce((latest, call) => new Date(call.callDate) > new Date(latest) ? call.callDate : latest, calls[0].callDate)
-            : "N/A";
-
-        let latestEmailDate = totalEmails
-            ? emails.reduce((latest, email) => new Date(email.emailDate) > new Date(latest) ? email.emailDate : latest, emails[0].emailDate)
-            : "N/A";
-
-        result.push({
-            accountName: account.name,
-            totalCalls,
-            totalEmails,
-            latestPhoneDate: latestPhoneDate ? formatDate(latestPhoneDate) : "N/A",
-            latestEmailDate: latestEmailDate ? formatDate(latestEmailDate) : "N/A",
-        });
+      account['totalCalls'] = callIndexedSummary[account.id]['totalCalls']
+      account['latestCallDate'] = callIndexedSummary[account.id]['latestCallDate']
+      
+      account['totalEmails'] = emailIndexedSummury[account.id]['totalEmails']
+      account['latestEmailDate'] = emailIndexedSummury[account.id]['latestEmailDate']
+      
     }
 
-    return result;
+    return accounts;
 }
 // Function to create the table
 function createTable(data, tableId) {
@@ -102,7 +90,7 @@ function createTable(data, tableId) {
         <td>${row.accountName}</td>
         <td>${row.totalCalls}</td>
         <td>${row.totalEmails}</td>
-        <td>${row.latestPhoneDate}</td>
+        <td>${row.latestCallDate}</td>
         <td>${row.latestEmailDate}</td>
       `;
       tbody.appendChild(tr);
@@ -141,13 +129,82 @@ function createTable(data, tableId) {
     createPagination(data.length);
   }
   
-function getUserTerritoryDetails(){
+function onChangeUser(){
     console.log(userDropdown.value);
-    const userTerritory = userDropdown.value
-    let result = getAccountDataByUser(userTerritory, processedDatabase);
-    console.log({[userTerritory]: result})
-    result = result.reverse()
-    createTable(result, 'territoryDetails')
+    const userTerritory = userDropdown.value;
+    // analysis  
+    getTerritorialAnalysis(userTerritory, processedDatabase.proccessedCallData)
+    // territorial data details 
+    territoryDetails = getAccountDataByUser(userTerritory, processedDatabase);
+    
+    console.log({[userTerritory]: territoryDetails})
+    result = territoryDetails.reverse()
+    createTable(territoryDetails, 'territoryDetails')
 }
+function getTerritorialAnalysis(territory, analysisDetails){
+  territorialCallAnalysis = processedDatabase.proccessedCallData[territory]
+  console.log({territorialCallAnalysis});
+  createChart(ctx, territorialCallAnalysis)
+}
+function createChart(ctx, dataSet) {
+  const labels = [];
+  const dataValues = [];
+  for (let key in dataSet) {
+    labels.push(key);
+    dataValues.push(dataSet[key].length);
+  }
 
-
+  const myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Dataset',
+          data: dataValues,
+          backgroundColor: [
+            'rgb(210, 237, 255)',
+            'rgb(35, 116, 170)',
+            'rgb(178, 217, 243)',
+            'rgb(54, 162, 235)',
+            'rgb(8, 149, 243)',
+          ],
+          hoverOffset: 4,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: (context) => {
+              const label = context.label || '';
+              const value = context.raw;
+              const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+              const percentage = ((value / total) * 100).toFixed(2);
+              return `${label}: ${value} (${percentage}%)`;
+            },
+          },
+        },
+        title: {
+          display: true,
+          text: 'Custom Chart Title',
+        },
+      },
+      onClick: (e, elements) => {
+        if (elements.length > 0) {
+          const segmentIndex = elements[0].index;
+          const label = myChart.data.labels[segmentIndex];
+          const callTypeData = dataSet[label] || [];
+          console.log({[label]:callTypeData})
+          createTable(callTypeData, 'callAnalysis')
+        }
+      },
+    },
+  });
+}

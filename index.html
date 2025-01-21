@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple HTML Page</title>
+    <link rel="stylesheet" href="./assests/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="col form-control">
+            <label class="fs-sm" for="user">Select User</label><br>
+            <select class="form-select" name="user" id="user" onchange="onChangeUser()">
+                <option value="">Select User</option>
+            </select>
+        </div>
+    </header>
+    <main>
+        <section id="block-one">
+            <div class="button-box">
+                <button onclick="alert('You clicked me!')">Please select a User to View Analytics</button>
+                <button onclick="alert('You clicked me!')">Please select a user to view account details</button>
+                <!-- <div>
+                    <canvas id="myChart"></canvas>
+                  </div> -->
+                  <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+                    <canvas id="myChart"></canvas>
+                </div>
+                  
+            </div>
+        </section>
+        <section class="analytics-block">
+            <div class="chartBox"></div>
+            <div class="details-box">
+                <table id="callAnalysis"></table>
+            </div>
+        </section>
+        <section class="account-details">
+            <div class="table-wrapper">
+                <table id="territoryDetails"></table>
+            </div>
+        </section>
+    </main>
+    <footer>
+        &copy; 2025 MyWebsite
+    </footer>
+    <script src="./assests/js/db.js"></script>
+    <script src="./assests/js/main.js"></script>
+    <!-- <script>
+      
+
+
+window.addEventListener('beforeprint', () => myChart.resize(600, 600));
+window.addEventListener('afterprint', () => myChart.resize());
+
+      </script> -->
+</body>
+</html>

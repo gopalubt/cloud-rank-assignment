@@ -44,35 +44,69 @@ const loadData = async () => {
 };
 
 function createIndexes(accounts, calls, emails) {
-    const accountIndexByTerritory = {}; // Territory -> Accounts
-    const callIndexByAccount = {};     // AccountId -> Calls
-    const emailIndexByAccount = {};    // AccountId -> Emails
+    const accountIndexByTerritory = {};  // catergorise account by territory;
+    const accountIndexById={}    //account indexed with id
+    const callIndexedSummary={}  // call indexed with account id and summary count with latestdate
+    const proccessedCallData={} //categorised with region then callTypes
+    const emailIndexedSummury={} //email summary by region and account id
 
-    // Index accounts by territory
+    // Index accounts by territory and id
     for (const account of accounts) {
         if (!accountIndexByTerritory[account.territory]) {
             accountIndexByTerritory[account.territory] = [];
         }
         accountIndexByTerritory[account.territory].push(account);
+        // ac id indexing 
+        accountIndexById[account.id]= account
     }
-
+    
     // Index calls by accountId
     for (const call of calls) {
-        if (!callIndexByAccount[call.accountId]) {
-            callIndexByAccount[call.accountId] = [];
+        // call map with account territory and name 
+        call['accountName'] = accountIndexById[call.accountId]['name'];
+        call['territory']= accountIndexById[call.accountId]['territory'];
+        
+       
+        if(!callIndexedSummary[call.accountId]){
+            callIndexedSummary[call.accountId] = {
+                accountName: call['accountName'],
+                totalCalls : 0,
+                latestCallDate : call.callDate
+            };
         }
-        callIndexByAccount[call.accountId].push(call);
+        callIndexedSummary[call.accountId]['totalCalls']++ ;
+        let latest =  callIndexedSummary[call.accountId]['latestCallDate'];
+        callIndexedSummary[call.accountId]['latestCallDate']  = new Date(call.callDate) > new Date(latest) ? call.callDate : latest;
+       
+        if(!proccessedCallData[call['territory']]){
+            proccessedCallData[call['territory']] = {}
+        }
+        if(!proccessedCallData[call['territory']][call.callType]){
+            proccessedCallData[call['territory']][call.callType] = []
+        }
+        proccessedCallData[call['territory']][call.callType].push(call)
     }
+    console.log({proccessedCallData, callIndexedSummary})
 
     // Index emails by accountId
+   
     for (const email of emails) {
-        if (!emailIndexByAccount[email.accountId]) {
-            emailIndexByAccount[email.accountId] = [];
+       
+        if(!emailIndexedSummury[email.accountId]){
+            emailIndexedSummury[email.accountId] = {
+                totalEmails : 0,
+                latestEmailDate : email.emailDate
+            };
         }
-        emailIndexByAccount[email.accountId].push(email);
+        
+        emailIndexedSummury[email.accountId]['totalEmails']++ ;
+        let latest =  emailIndexedSummury[email.accountId]['latestEmailDate'];
+        emailIndexedSummury[email.accountId]['latestEmailDate']  = new Date(email.emailDate) > new Date(latest) ? email.emailDate : latest;
+       
     }
-
-    return { accountIndexByTerritory, callIndexByAccount, emailIndexByAccount };
+    console.log({emailIndexedSummury})
+    // { accountIndexByTerritory, callIndexByAccount, emailIndexByAccount, accountIndex };
+    return { accountIndexByTerritory, proccessedCallData, callIndexedSummary, emailIndexedSummury };
 }
 
 
