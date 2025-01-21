@@ -34,6 +34,7 @@ header {
 }
 main {
     width: 100%;
+    margin-bottom:3rem;
 }
 .d-none{display: none !important;}
 .block-header{
@@ -91,9 +92,11 @@ table {
     padding: 8px;
     text-align: left;
     font-size: 12px;
+    text-align: center;
  }
   th {
     background-color: rgb(219 234 255);
+    color: var(--bg-primary)
   }
   .pagination {
     display: flex;
