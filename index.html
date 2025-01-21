@@ -10,35 +10,33 @@
 <body>
     <header>
         <div class="col form-control">
-            <label class="fs-sm" for="user">Select User</label><br>
+            <label for="user">Select User</label><br>
             <select class="form-select" name="user" id="user" onchange="onChangeUser()">
                 <option value="">Select User</option>
             </select>
         </div>
     </header>
     <main>
-        <section id="block-one">
-            <div class="button-box">
-                <button onclick="alert('You clicked me!')">Please select a User to View Analytics</button>
-                <button onclick="alert('You clicked me!')">Please select a user to view account details</button>
-                <!-- <div>
-                    <canvas id="myChart"></canvas>
-                  </div> -->
-                  <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <section class="block analytics-block">
+            <div class="block-header w-100 shadow-1">Please select a User to View Analytics</div>
+            <div class="chartBox w-50 px-15">
+                <div class="chart-container" style="position: relative; height:40vh; width:80vw">
                     <canvas id="myChart"></canvas>
                 </div>
-                  
             </div>
-        </section>
-        <section class="analytics-block">
-            <div class="chartBox"></div>
-            <div class="details-box">
-                <table id="callAnalysis"></table>
+            <div class="details-box w-50 px-15">
+                <div class="table-wrapper">
+                    <div class="block-header">Other Details</div>
+                    <table id="callAnalysis" class="mytable shadow-1"></table>
+                </div>
             </div>
         </section>
         <section class="account-details">
+            <div class="block-header shadow-1 d-none">Please select a user to view account details</div>
+            
             <div class="table-wrapper">
-                <table id="territoryDetails"></table>
+                <div class="block-header">user Terrrory Account Details</div>
+                <table id="territoryDetails" class="mytable shadow-1"></table>
             </div>
         </section>
     </main>

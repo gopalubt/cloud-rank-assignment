@@ -1,9 +1,10 @@
-let rowsPerPage = 10;
+let rowsPerPage = 12;
 let currentPage = 1;
 let processedDatabase = null;
 let territoryDetails= null;
 let callAnalysis= null;
-let territorialCallAnalysis= null
+let territorialCallAnalysis= null;
+let selectedCallAnalysisLabel = ''
 const userDropdown = document.getElementById("user");
 const ctx = document.getElementById('myChart').getContext('2d');
 
@@ -59,7 +60,7 @@ function getAccountDataByUser(territory, processedDatabase) {
     return accounts;
 }
 // Function to create the table
-function createTable(data, tableId) {
+function createTable( data, tableId ) {
     // const tableContainer = document.getElementById('territoryDetails');
     const tableContainer = document.getElementById(tableId);
     tableContainer.innerHTML = '';
@@ -67,7 +68,7 @@ function createTable(data, tableId) {
     const table = document.createElement('table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
-  
+    
     // Table header
     thead.innerHTML = `
       <tr>
@@ -87,11 +88,11 @@ function createTable(data, tableId) {
     pageData.forEach(row => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${row.accountName}</td>
+        <td>${row.name}</td>
         <td>${row.totalCalls}</td>
         <td>${row.totalEmails}</td>
-        <td>${row.latestCallDate}</td>
-        <td>${row.latestEmailDate}</td>
+        <td>${formatDate(row.latestCallDate)}</td>
+        <td>${formatDate(row.latestEmailDate)}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -138,7 +139,7 @@ function onChangeUser(){
     territoryDetails = getAccountDataByUser(userTerritory, processedDatabase);
     
     console.log({[userTerritory]: territoryDetails})
-    result = territoryDetails.reverse()
+    // result = territoryDetails.reverse()
     createTable(territoryDetails, 'territoryDetails')
 }
 function getTerritorialAnalysis(territory, analysisDetails){
@@ -199,12 +200,51 @@ function createChart(ctx, dataSet) {
       onClick: (e, elements) => {
         if (elements.length > 0) {
           const segmentIndex = elements[0].index;
-          const label = myChart.data.labels[segmentIndex];
-          const callTypeData = dataSet[label] || [];
-          console.log({[label]:callTypeData})
-          createTable(callTypeData, 'callAnalysis')
+          selectedCallAnalysisLabel = myChart.data.labels[segmentIndex];
+          const callTypeData = dataSet[selectedCallAnalysisLabel] || [];
+          createCallAnalysisTable(callTypeData, 'callAnalysis')
         }
       },
     },
   });
+}
+function createCallAnalysisTable(data, tableId ) {
+  const tableContainer = document.getElementById(tableId);
+  tableContainer.innerHTML = '';
+
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const tbody = document.createElement('tbody');
+  
+  // Table header
+  thead.innerHTML = `
+    <tr>
+      <th>Call ID</th>
+      <th>Account Name</th>
+      <th>Call Date</th>
+      <th>Call Status</th>
+    </tr>
+  `;
+
+  // Table body (current page data)
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const pageData = data.slice(startIndex, endIndex);
+
+  pageData.forEach(row => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${row.id}</td>
+      <td>${row.accountName}</td>
+      <td>${formatDate(row.callDate)}</td>
+      <td>${row.callStatus}</td>
+      
+    `;
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  tableContainer.appendChild(table);
 }
