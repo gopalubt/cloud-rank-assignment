@@ -1,7 +1,7 @@
 
 const fetchData = async (url) => {
     try {
-        if(location.origin='https://gopalubt.github.io'){
+        if(location.origin=='https://gopalubt.github.io'){
             url = `https://gopalubt.github.io/cloud-rank-assignment${url}`
         }
         const response = await fetch(url);
