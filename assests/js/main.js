@@ -6,8 +6,8 @@ let callAnalysis= null;
 let territorialCallAnalysis= null;
 let selectedCallAnalysisLabel = ''
 const userDropdown = document.getElementById("user");
-// const ctx = document.getElementById('myChart').getContext('2d');
 let existingChart = null;
+Chart.register(ChartDataLabels);
 
 const populateUserDropdown = (users) => {
   const fragment = document.createDocumentFragment(); 
@@ -141,7 +141,18 @@ function createChart(dataSet) {
         legend: {
           display: true,
           position: 'top',
-        },
+          labels: {
+              boxWidth: 10,
+              boxHeight: 10,
+              padding: 5,
+              font: {
+                  size: 12,
+                  weight: 'bold'
+              },
+              color: 'rgb(13, 65, 213)'
+          }
+      },
+        
         tooltip: {
           enabled: true,
           callbacks: {
@@ -158,6 +169,23 @@ function createChart(dataSet) {
         //   display: true,
         //   text: 'Custom Chart Title',
         // },
+        datalabels: {
+          color: 'rgb(13, 65, 213)', // Label color
+          font: {
+              size: 12,
+              weight: 'bold'
+          },
+          formatter: (value, context) => {
+            const label = context.chart.data.labels[context.dataIndex];
+            const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+            const percentage = ((value / total) * 100).toFixed(2);
+            return `${label} (${percentage}%)`;
+          },
+         
+          anchor: 'start', // Position labels outside the chart
+          align: 'end',    // Align labels at the outside
+          offset: 100  
+      }
       },
       onClick: (e, elements) => {
         if (elements.length > 0) {

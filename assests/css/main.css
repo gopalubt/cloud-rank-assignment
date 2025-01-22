@@ -154,3 +154,20 @@ table {
     background-color: #83a6cb;
     cursor: not-allowed;
 }
+
+
+#chart-container {
+    background-color: #003399; /* Blue background matching the image */
+    padding: 20px 10px;
+    text-align: center;
+    color: white; /* Text color for labels */
+    border-radius: 10px; /* Rounded corners */
+    margin-bottom: 20px;
+}
+
+#myChartDemo {
+    margin: 0 auto;
+    display: block;
+    background-color: rgba(240, 248, 255, 0.9); /* Optional light background */
+    border-radius: 10px;
+}
