@@ -42,20 +42,27 @@ main {
     height: 100%;
     background: var(--bg-secondary);
     font-size: 14px;
+    font-weight: 600;
     border: 0;
     padding: 15px;
     text-align:center;
+    color: rgb(13 65 213)
 }
-.block{
-    padding-block: 1rem;
-}
+
 .shadow-1{
     box-shadow: 0px 1px 3px 1px #d6d6d6;
 }
-/* .account-details{
-   
-} */
+.my-3{margin-block: 1rem !important}
+.mb-1{margin-bottom: .75rem !important}
 .table-wrapper{ background: var(--bg-secondary);}
+.chartBox{ 
+    background: var(--bg-secondary);
+    margin-right: 1%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:515px;
+}
 table.mytable {
     width: max(315px, 98%);
     margin: auto;
@@ -65,16 +72,16 @@ table.mytable {
     width:100% !important;
 }
 .w-50{
-    width:50% !important;
+    width:49% !important;
 }
-.analytics-block{
+.analytics-block, .analytics-block .block-content{
     display: flex;
     height:100%;
     flex-wrap: wrap;
 }
-/* .px-15{padding-inline:15px !important} */
+
 footer {
-    background-color: #222;
+    background-color: var(--bg-primary);
     color: white;
     padding: 10px;
     width: 100%;
@@ -87,6 +94,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    /* min-height: 385px; */
   }
   th, td {
     padding: 8px;
@@ -96,25 +104,53 @@ table {
  }
   th {
     background-color: rgb(219 234 255);
-    color: var(--bg-primary)
+    color: rgb(13 65 213);
   }
-  .pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-  }
+ 
+   /* Styles for the pagination component */
+   .pagination  {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        justify-content: space-between;
+        padding: 15px;
+    }
   .pagination button {
     padding: 8px 12px;
     margin: 0 5px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    cursor: pointer;
-  }
-  .pagination button.active {
+    border: none;
     background-color: #007bff;
     color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 500ms linear;
   }
-  .pagination button:disabled {
+  
+  .items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .item {
+    width: 100px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: #f4f4f4;
-    cursor: not-allowed;
+    border: 1px solid #ddd;
+    border-radius: 4px;
   }
+  .pagination-pg-info {
+    color: #1e40af;
+    font-size: 14px;
+}
+.pagination button:active, .pagination button.active  {
+    background-color: #0e5eb3;
+    transition: all 500ms linear;
+}
+.pagination button:disabled, .pagination button.disabled {
+    background-color: #83a6cb;
+    cursor: not-allowed;
+}

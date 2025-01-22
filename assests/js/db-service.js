@@ -1,6 +1,4 @@
 
-
-// Centralized fetch function with error handling
 const fetchData = async (url) => {
     try {
         const response = await fetch(url);
@@ -24,19 +22,13 @@ const loadData = async () => {
     };
 
     try {
-        // Fetch all data in parallel
         const [users, accounts, calls, emails] = await Promise.all(
             Object.values(urls).map(fetchData)
         );
-
-        // Check if any dataset is null (indicates a fetch error)
         if (!users || !accounts || !calls || !emails) {
             console.error("Failed to load one or more datasets.");
             return;
         }
-
-
-        // Return all loaded data for further processing
         return { users, accounts, calls, emails };
     } catch (error) {
         console.error("Error loading data:", error);
@@ -89,7 +81,6 @@ function createIndexes(accounts, calls, emails) {
     console.log({proccessedCallData, callIndexedSummary})
 
     // Index emails by accountId
-   
     for (const email of emails) {
        
         if(!emailIndexedSummury[email.accountId]){
@@ -104,8 +95,6 @@ function createIndexes(accounts, calls, emails) {
         emailIndexedSummury[email.accountId]['latestEmailDate']  = new Date(email.emailDate) > new Date(latest) ? email.emailDate : latest;
        
     }
-    console.log({emailIndexedSummury})
-    // { accountIndexByTerritory, callIndexByAccount, emailIndexByAccount, accountIndex };
     return { accountIndexByTerritory, proccessedCallData, callIndexedSummary, emailIndexedSummury };
 }
 

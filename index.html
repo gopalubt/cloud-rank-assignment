@@ -17,41 +17,39 @@
         </div>
     </header>
     <main>
-        <section class="block analytics-block">
-            <div class="block-header w-100 shadow-1">Please select a User to View Analytics</div>
-            <div class="chartBox w-50 px-15">
-                <div class="chart-container" style="position: relative; height:40vh; width:80vw">
-                    <canvas id="myChart"></canvas>
+        <section class="analytics-block">
+            <div class="block-header w-100 shadow-1 my-3">Please select a User to View Analytics</div>
+            <div class="w-100 block-content d-none mb-1">
+                <div class="chartBox w-50 px-15 shadow-1">
+                    <div class="chart-container" style="position: relative; height:max(70%, 400px); width:max(75%, 300px)">
+                        <canvas id="myChart" width="400" height="400"></canvas>
+                    </div>
                 </div>
-            </div>
-            <div class="details-box w-50 px-15">
-                <div class="table-wrapper">
-                    <div class="block-header">Other Details</div>
-                    <table id="callAnalysis" class="mytable shadow-1"></table>
+                <div class="details-box w-50 px-15">
+                    <div class="table-wrapper shadow-1">
+                        <div class="block-header"><span id="selected-chartLabel"></span> Details</div>
+                        <table id="callAnalysis" class="mytable shadow-1"></table>
+                        <div class="pagination" id="analysis-pagination"></div>
+                    </div>
                 </div>
             </div>
         </section>
         <section class="account-details">
-            <div class="block-header shadow-1 d-none">Please select a user to view account details</div>
-            
-            <div class="table-wrapper">
-                <div class="block-header">user Terrrory Account Details</div>
-                <table id="territoryDetails" class="mytable shadow-1"></table>
+            <div class="block-header shadow-1">Please select a user to view account details</div>
+            <div class="w-100 block-content d-none">
+                <div class="table-wrapper">
+                    <div class="block-header"><span id="selected-user"></span> Terrrory Account Details</div>
+                    <table id="territoryDetails" class="mytable shadow-1"></table>
+                    <div class="pagination" id="pagination"></div>
+                </div>
             </div>
         </section>
     </main>
     <footer>
         &copy; 2025 MyWebsite
     </footer>
-    <script src="./assests/js/db.js"></script>
+    <script src="./assests/js/db-service.js"></script>
+    <script src="./assests/js/pagination.js"></script>
     <script src="./assests/js/main.js"></script>
-    <!-- <script>
-      
-
-
-window.addEventListener('beforeprint', () => myChart.resize(600, 600));
-window.addEventListener('afterprint', () => myChart.resize());
-
-      </script> -->
 </body>
 </html>

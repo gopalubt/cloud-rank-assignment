@@ -1,18 +1,20 @@
 let rowsPerPage = 12;
 let currentPage = 1;
 let processedDatabase = null;
-let territoryDetails= null;
+let territoryDetails= [];
 let callAnalysis= null;
 let territorialCallAnalysis= null;
 let selectedCallAnalysisLabel = ''
 const userDropdown = document.getElementById("user");
-const ctx = document.getElementById('myChart').getContext('2d');
+// const ctx = document.getElementById('myChart').getContext('2d');
+let existingChart = null;
 
 const populateUserDropdown = (users) => {
   const fragment = document.createDocumentFragment(); 
   users.forEach(user => {
       const option = document.createElement("option");
-      option.value = user.territory;
+      // option.value = user.territory;
+      option.value = JSON.stringify(user);
       option.textContent = user.userName;
       fragment.appendChild(option);
   });
@@ -23,16 +25,10 @@ const populateUserDropdown = (users) => {
 loadData().then((data) => {
   if (data) {
       const { users, accounts, calls, emails } = data;
-      console.log("All data loaded successfully:", data);
       processedDatabase = createIndexes(accounts, calls, emails);
-      console.log({processedDatabase})
-    
       populateUserDropdown(users);
   }
 });
-
-
-
 
 const formatDate = (date) => {
     const d = new Date(date);
@@ -101,61 +97,27 @@ function createTable( data, tableId ) {
     table.appendChild(tbody);
     tableContainer.appendChild(table);
   }
-  
-  // Function to create pagination controls
-  function createPagination(totalItems) {
-    const pagination = document.getElementById('pagination');
-    pagination.innerHTML = '';
-  
-    const totalPages = Math.ceil(totalItems / rowsPerPage);
-  
-    for (let i = 1; i <= totalPages; i++) {
-      const button = document.createElement('button');
-      button.textContent = i;
-      button.classList.toggle('active', i === currentPage);
-      button.disabled = i === currentPage;
-  
-      button.addEventListener('click', () => {
-        currentPage = i;
-        updateTableAndPagination();
-      });
-  
-      pagination.appendChild(button);
-    }
-  }
-  
-  // Function to update the table and pagination
-  function updateTableAndPagination() {
-    createTable(data);
-    createPagination(data.length);
-  }
-  
-function onChangeUser(){
-    console.log(userDropdown.value);
-    const userTerritory = userDropdown.value;
-    // analysis  
-    getTerritorialAnalysis(userTerritory, processedDatabase.proccessedCallData)
-    // territorial data details 
-    territoryDetails = getAccountDataByUser(userTerritory, processedDatabase);
-    
-    console.log({[userTerritory]: territoryDetails})
-    // result = territoryDetails.reverse()
-    createTable(territoryDetails, 'territoryDetails')
-}
+
 function getTerritorialAnalysis(territory, analysisDetails){
-  territorialCallAnalysis = processedDatabase.proccessedCallData[territory]
+  territorialCallAnalysis = analysisDetails[territory]
   console.log({territorialCallAnalysis});
-  createChart(ctx, territorialCallAnalysis)
+  document.querySelector('.details-box').classList.add('d-none')
+  createChart(territorialCallAnalysis);
 }
-function createChart(ctx, dataSet) {
-  const labels = [];
+function createChart(dataSet) {
+  const ctx = document.getElementById('myChart').getContext('2d');
+  if (existingChart) {
+    existingChart.destroy();
+  }
+
+  const labels = ['Face to Face', 'InPerson', 'Email', 'Phone', 'Other'];
   const dataValues = [];
-  for (let key in dataSet) {
-    labels.push(key);
+  for (let key of labels) {
+    // labels.push(key);
     dataValues.push(dataSet[key].length);
   }
 
-  const myChart = new Chart(ctx, {
+  existingChart = new Chart(ctx, {
     type: 'pie',
     data: {
       labels: labels,
@@ -164,11 +126,11 @@ function createChart(ctx, dataSet) {
           label: 'Dataset',
           data: dataValues,
           backgroundColor: [
-            'rgb(210, 237, 255)',
-            'rgb(35, 116, 170)',
-            'rgb(178, 217, 243)',
-            'rgb(54, 162, 235)',
-            'rgb(8, 149, 243)',
+            'rgb(25, 118, 210)',
+            'rgb(40, 136, 231)',
+            'rgb(144, 202, 249)',
+            'rgb(100, 181, 246)',
+            'rgb(60, 166, 252)',
           ],
           hoverOffset: 4,
         },
@@ -192,17 +154,20 @@ function createChart(ctx, dataSet) {
             },
           },
         },
-        title: {
-          display: true,
-          text: 'Custom Chart Title',
-        },
+        // title: {
+        //   display: true,
+        //   text: 'Custom Chart Title',
+        // },
       },
       onClick: (e, elements) => {
         if (elements.length > 0) {
           const segmentIndex = elements[0].index;
-          selectedCallAnalysisLabel = myChart.data.labels[segmentIndex];
+          selectedCallAnalysisLabel = e.chart.legend.legendItems[segmentIndex].text;
           const callTypeData = dataSet[selectedCallAnalysisLabel] || [];
-          createCallAnalysisTable(callTypeData, 'callAnalysis')
+          document.getElementById('selected-chartLabel').innerText = `${selectedCallAnalysisLabel}`;
+          // createCallAnalysisTable(callTypeData, 'callAnalysis')
+          document.querySelector('.details-box').classList.remove('d-none')
+          const analysisPagination = new Pagination(callTypeData, 12, 'analysis-pagination', createCallAnalysisTable, 'callAnalysis' );
         }
       },
     },
@@ -247,4 +212,30 @@ function createCallAnalysisTable(data, tableId ) {
   table.appendChild(thead);
   table.appendChild(tbody);
   tableContainer.appendChild(table);
+}
+const territorialPagination = new Pagination(territoryDetails, 12, 'pagination', createTable, 'territoryDetails' );
+const userSelected = document.getElementById('selected-user');
+const blockHeading = document.querySelectorAll('.block-header.shadow-1');
+const contentBlocks = document.querySelectorAll('.block-content');
+function onChangeUser(){
+ 
+    if(!userDropdown.value){
+      blockHeading.forEach(ele=> ele.classList.remove('d-none'));
+      contentBlocks.forEach(ele=> ele.classList.add('d-none'));
+
+    }else{
+      blockHeading.forEach(ele=> ele.classList.add('d-none'));
+      contentBlocks.forEach(ele=> ele.classList.remove('d-none'));
+    }
+    const user = JSON.parse(userDropdown.value);
+    const userTerritory = user.territory;
+    const userName = user.userName;
+    
+    // territorial data details 
+    userSelected.innerText = `${userName}'s`;
+    territoryDetails = getAccountDataByUser(userTerritory, processedDatabase);    
+    territorialPagination.refresh(territoryDetails );
+    // analysis  
+    getTerritorialAnalysis(userTerritory, processedDatabase.proccessedCallData)
+
 }
