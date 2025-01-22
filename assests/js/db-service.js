@@ -1,6 +1,9 @@
 
 const fetchData = async (url) => {
     try {
+        if(location.origin='https://gopalubt.github.io'){
+            url = `https://gopalubt.github.io/cloud-rank-assignment${url}`
+        }
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
